@@ -23,6 +23,11 @@ export default class Square {
       this._player = null;
     }
 
+    get x() { return this._pos.x; }
+    get y() { return this._pos.y; }
+    set player(player) { this._player = player; }
+    get player() { return this._player; }
+
     setEdge(direction, edge) {
         this._edges.set(direction, edge);
     }
@@ -35,22 +40,6 @@ export default class Square {
         return Array.from(this._edges.values()).every(value => {
             return value.clicked != null;
         })
-    }
-  
-    get x() {
-      return this._pos.x;
-    }
-  
-    get y() {
-      return this._pos.y;
-    }
-  
-    set player(player) {
-      this._player = player;
-    }
-
-    get player() {
-        return this._player;
     }
   
     get style() {
