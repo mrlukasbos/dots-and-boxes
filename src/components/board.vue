@@ -14,7 +14,6 @@
 <script>
 import constants from '../constants'
 
-
 export default {
   name: 'board',
   props: [
@@ -32,24 +31,47 @@ export default {
 </script>
 
 <style scoped>
-.players {
+.board-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 24px;
+  background-color: white;
+  margin-right: 12px;
+  border-radius: 4px;
+}
+
+.board {
   position: relative;
 }
 
-.player {
+.squares {
+  left: 0;
+  right: 0;
+  position: absolute;
   display: flex;
-  flex-direction: row;
-  align-items: center;
 }
 
-.player-indicator {
-  width: 20px;
-  height: 20px;
-  margin: 8px;
-  border: 3px solid whitesmoke;
+.edges {
+  left: 0;
+  right: 0;
+  position: absolute;
 }
 
-.player-indicator.current {
-  border: 3px solid red;
+.bg-square {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 50%;
+}
+
+.edge {
+  background: lightgray;
+  position: absolute;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background .3s;
 }
 </style>

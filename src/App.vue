@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <config-view :visible="showConfigModal" v-on:apply="init" v-on:closeModal="showConfigModal = false" :config="config"/>
     <div class="game">
       <board-view :board="board"/>
       <div class="controls">
@@ -10,7 +11,10 @@
         <div v-if="board.gameIsDrawn()"> 
           Game finished! It is a <strong> Draw </strong>
         </div>
-        <button class="button" v-on:click="init"> Restart game </button>
+        <div class="buttons">
+          <button class="button secondary" v-on:click="showConfigModal = true"> Configuration </button>
+          <button class="button" v-on:click="init"> Restart game </button>
+        </div>
       </div>
     </div>
   </div>
@@ -19,6 +23,8 @@
 <script>
 import PlayersView from './components/players'
 import BoardView from './components/board'
+import ConfigView from './components/config'
+
 import Player from './player'
 import Board from './board'
 
@@ -27,13 +33,20 @@ export default {
   components: {
     'players-view': PlayersView,
     'board-view': BoardView,
+    'config-view': ConfigView,
   },
   data: function() {
     return {
       board: null,
+      showConfigModal: false,
       config: {
         width: 5,
         height: 5,
+        players: [
+          new Player("player 1", "purple"),
+          new Player("player 2", "orange"),
+          new Player("player 3", "steelblue"),
+        ]
       },
     }
   },
@@ -44,12 +57,7 @@ export default {
   
   methods: {
     init: function() {
-      this.players = [
-        new Player("player 1", "purple"),
-        new Player("player 2", "green"),
-        new Player("player 3", "blue"),
-      ]
-      this.board = new Board(this.config.width, this.config.height, this.players);
+      this.board = new Board(this.config.width, this.config.height, this.config.players);
     }
   }
 }
@@ -76,49 +84,7 @@ export default {
   border: 3px solid gray;
   padding: 24px;
   margin-top: 50px;
-}
-
-.board-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  padding: 24px;
-  background-color: white;
-  margin-right: 12px;
-}
-
-.board {
-  position: relative;
-}
-
-.squares {
-  left: 0;
-  right: 0;
-  position: absolute;
-  display: flex;
-}
-
-.edges {
-  left: 0;
-  right: 0;
-  position: absolute;
-}
-
-.bg-square {
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  border-radius: 50%;
-}
-
-.edge {
-  background: lightgray;
-  position: absolute;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background .3s;
+  border-radius: 12px;
 }
 
 .controls {
@@ -131,9 +97,52 @@ export default {
 
 .button {
   width: 100%;
-  background-color: teal;
+  background-color: slateblue;
   border: none;
-  height: 54px;
+  height: 46px;
   color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  margin: 2px;
+}
+
+
+.button.small {
+  width: auto;
+  height: 32px;
+}
+
+.link {
+  color: slateblue;
+  font-weight: bold;
+  font-size: 1.2rem;
+  border-radius: 16px;
+  cursor: pointer;
+  padding: 4px 10px;
+}
+
+.link:hover {
+  background-color: #efefef;
+  
+}
+
+.link.danger {
+  color: orangered; 
+}
+
+.button.secondary {
+  background-color: gray;
+}
+
+.button:hover {
+  opacity: .8;
+  transition: opacity 0.3s;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
 }
 </style>

@@ -2,7 +2,7 @@
     <div class="players"> 
         <div v-for="player in board.players" :key="player.name" class="player">
         <div class="player-indicator" :class="{'current': (player === board.currentPlayer)}" :style="player.style"/>
-        {{player.name}} ({{player.score}})
+        <span :class="{'current': (player === board.currentPlayer)}">{{player.name}} ({{player.score}}) </span>
         </div>
     </div>
 </template>
@@ -36,5 +36,9 @@ export default {
 
 .player-indicator.current {
   border: 3px solid red;
+}
+
+.current {
+    font-weight: bold;    
 }
 </style>
