@@ -13,11 +13,13 @@
                 <div v-for="(player,index) in config.players" :key="index" class="player"> 
                     <span> <input v-model="player.name" type="text" placeholder="name"/> </span>
                     <span> <input v-model="player.color" type="text" placeholder="color"/> </span>
+                    <input type="checkbox" id="checkbox" v-model="player.ai">
                     <span> <a class="link small danger" v-on:click="removePlayer(player)"> ✕ </a> </span>
                 </div> 
                 <div class="player new">
                     <span> <input v-model="new_player.name" type="text" placeholder="name"/> </span>
                     <span> <input v-model="new_player.color" type="text" placeholder="color"/> </span>
+                    <input type="checkbox" id="checkbox" v-model="new_player.ai">
                     <span> <a class="link small" v-on:click="addPlayer"> &#43; </a> </span>
                 </div>
             </div>

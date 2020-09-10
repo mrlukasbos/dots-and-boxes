@@ -43,9 +43,8 @@ export default {
         width: 5,
         height: 5,
         players: [
-          new Player("player 1", "purple"),
-          new Player("player 2", "orange"),
-          new Player("player 3", "steelblue"),
+          new Player("John", "purple", true),
+          new Player("Mike", "orange", true),
         ]
       },
     }
@@ -58,6 +57,7 @@ export default {
   methods: {
     init: function() {
       this.board = new Board(this.config.width, this.config.height, this.config.players);
+      this.board.start();
     }
   }
 }

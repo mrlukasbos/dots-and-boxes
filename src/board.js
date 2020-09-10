@@ -1,6 +1,7 @@
 import Square, {Direction, OppositeDirection} from './square'
 import Edge from './edge'
 import Coord from './coord'
+import Ai from './ai';
 
 export default class Board {
     constructor(width, height, players) {
@@ -38,8 +39,23 @@ export default class Board {
         return this.squares.flat();
     }
 
+    checkForAIMove() {
+        if (this.getCurrentPlayer().ai) {
+            let randomMove = Ai.getRandomMove(this._edges);
+            this.selectEdge(randomMove);
+        }
+    }
+
+    start() {
+        this.players.forEach(player => {
+            player.resetScore();
+        })
+        this.checkForAIMove();
+    }
+
     goToNextPlayer() {
         this._currentPlayerIndex = (this._currentPlayerIndex + 1) % this._players.length;
+        this.checkForAIMove();
     }
 
     getCurrentPlayer() {
@@ -49,7 +65,7 @@ export default class Board {
     // Handle the selection of an edge. To be called by the current player.
     selectEdge(edge) {
         if (edge.clicked) return;
-
+        
         edge.clicked = this.currentPlayer;
         let didFillSquare = false;
         edge.squares.forEach(square => {
@@ -64,6 +80,7 @@ export default class Board {
             this.goToNextPlayer()
         } else {
             this.checkWinner();
+            if (!this.gameIsFinished()) this.checkForAIMove();
         }
     }
 

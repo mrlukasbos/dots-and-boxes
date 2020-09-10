@@ -1,8 +1,10 @@
 <template>
     <div class="players"> 
         <div v-for="player in board.players" :key="player.name" class="player">
-        <div class="player-indicator" :class="{'current': (player === board.currentPlayer)}" :style="player.style"/>
-        <span :class="{'current': (player === board.currentPlayer)}">{{player.name}} ({{player.score}}) </span>
+          <div class="player-indicator" :class="{'current': (player === board.currentPlayer)}" :style="player.style"/>
+          <span :class="{'current': (player === board.currentPlayer)}">{{player.name}} </span>
+          <span class="ai" v-if="player.ai"> AI </span>
+          <span>({{player.score}}) </span>
         </div>
     </div>
 </template>
@@ -25,6 +27,15 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+
+.ai {
+  background: black;
+  color: white;
+  font-weight: bold;
+  margin: 0px 12px;
+  padding: 0px 8px;
+  border-radius: 4px;
 }
 
 .player-indicator {
