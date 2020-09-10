@@ -16,7 +16,7 @@
         <div class="players"> 
           <div v-for="player in players" :key="player.name" class="player">
             <div class="player-indicator" :class="{'current': (player == currentPlayer)}" :style="playerStyle(player)"/>
-            {{player.name}} ({{getAmountOfSquares(player)}})
+            {{player.name}} ({{player.score}})
           </div>
         </div>
 
@@ -35,11 +35,27 @@
 </template>
 
 <script>
+import Player from './player';
 
 // global constants
 const TILE_WIDTH = 50; // px
 const TILE_HEIGHT = 50; // px
 const BORDER_WIDTH = 8; // px
+
+// class Coord {
+//   constructor(x,y) {
+//     this.x = x;
+//     this.y = y;
+//   }
+// }
+
+// class Edge {
+//   constructor(coord, vertical, squares) {
+//     this.coord = coord;
+//     this.vertical = vertical;
+//     this.squares = squares;
+//   }
+// }
 
 export default {
   name: 'App',
@@ -51,17 +67,7 @@ export default {
       edges: [],
       winner: null,
       draw: false,
-      players: [{
-        name: "Player one",
-        color: "green"
-      }, {
-        name: "Player two",
-        color: "blue"
-      },
-      {
-        name: "Player three",
-        color: "purple"
-      }],
+      players: [new Player("Player one", "purple"), new Player("Player two", "green"), new Player("Player three", "blue")],
       currentPlayerIndex: 0,
     }
   },
@@ -88,6 +94,7 @@ export default {
       let didFillSquare = false;
       edge.squares.forEach(square => {
         if (this.isFull(square)) {
+          this.currentPlayer.incrementScore();
           square.player = this.currentPlayer;
           didFillSquare = true;
         }
@@ -142,12 +149,6 @@ export default {
       return this.squares.flat();
     },
 
-    getAmountOfSquares(player) {
-        return this.getAllSquares().filter(square => {
-          return square.player === player;
-        }).length
-    },
-
     checkForWinner() {
       if (this.getAllSquares().every(square => {
           return square.player != null;
@@ -155,10 +156,10 @@ export default {
 
       // non-descructive sort
       let playersSortedByScore = this.players.slice().sort((p1, p2) => { 
-        return this.getAmountOfSquares(p1) < this.getAmountOfSquares(p2)
+        return p1.score < p2.score
       })
 
-      if (this.getAmountOfSquares(playersSortedByScore[0]) === this.getAmountOfSquares(playersSortedByScore[1])) {
+      if (playersSortedByScore[0].score === playersSortedByScore[1].score) {
         this.winner = null;
         this.draw = true;
       } else {
