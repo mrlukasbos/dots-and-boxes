@@ -1,21 +1,21 @@
 <template>
   <div id="app">
     <div class="game">
-
-      <div class="board">
-        <div v-for="(row, index) in squares" :key="'row'+index">
-          <div v-for="(square, index) in row" :key="'square'+index">
-            <div class="bg-square" :style="squareStyle(square)"/>
+      <div class="board-wrapper">
+        <div class="board" :style="boardStyle">
+          <div v-for="(row, index) in squares" :key="'row'+index">
+            <div v-for="(square, index) in row" :key="'square'+index">
+              <div class="bg-square" :style="square.style"/>
+            </div>
           </div>
+          <div v-for="edge in edges" :key="edge.clicked + '-' + edge.vertical + '-' + edge.x + ',' + edge.y " class="edge" :style="edge.style" v-on:click="clickEdge(edge)"> </div>
         </div>
-        <div v-for="edge in edges" :key="edge.clicked + '-' + edge.vertical + '-' + edge.x + ',' + edge.y " class="edge" :style="edgeStyle(edge)" v-on:click="clickEdge(edge)"> </div>
       </div>
 
       <div class="controls">
-        <h3> Dots and Boxes </h3>
         <div class="players"> 
           <div v-for="player in players" :key="player.name" class="player">
-            <div class="player-indicator" :class="{'current': (player == currentPlayer)}" :style="playerStyle(player)"/>
+            <div class="player-indicator" :class="{'current': (player === currentPlayer)}" :style="player.style"/>
             {{player.name}} ({{player.score}})
           </div>
         </div>
@@ -36,38 +36,22 @@
 
 <script>
 import Player from './player';
-
-// global constants
-const TILE_WIDTH = 50; // px
-const TILE_HEIGHT = 50; // px
-const BORDER_WIDTH = 8; // px
-
-// class Coord {
-//   constructor(x,y) {
-//     this.x = x;
-//     this.y = y;
-//   }
-// }
-
-// class Edge {
-//   constructor(coord, vertical, squares) {
-//     this.coord = coord;
-//     this.vertical = vertical;
-//     this.squares = squares;
-//   }
-// }
+import Square, {Direction, OppositeDirection} from './square';
+import Edge from './edge'
+import Coord from './coord'
+import constants from './constants';
 
 export default {
   name: 'App',
   data: function() {
     return {
-      amount_horizontal_tiles: 5,
-      amount_vertical_tiles: 5,
+      amount_horizontal_tiles: 3,
+      amount_vertical_tiles: 3,
       squares: [],
       edges: [],
       winner: null,
       draw: false,
-      players: [new Player("Player one", "purple"), new Player("Player two", "green"), new Player("Player three", "blue")],
+      players: [],
       currentPlayerIndex: 0,
     }
   },
@@ -81,6 +65,12 @@ export default {
         return square.player != null;
       })
     },
+    boardStyle: function() {
+      return {
+        width: this.amount_horizontal_tiles * constants.TILE_WIDTH + constants.BORDER_WIDTH + "px",
+        height: this.amount_vertical_tiles * constants.TILE_HEIGHT + constants.BORDER_WIDTH + "px",
+      }
+    }
   },
 
   beforeMount: function() {
@@ -89,11 +79,11 @@ export default {
   
   methods: {
     clickEdge: function(edge) {
+      if (edge.clicked) return;
       edge.clicked = this.currentPlayer;
-
       let didFillSquare = false;
       edge.squares.forEach(square => {
-        if (this.isFull(square)) {
+        if (square.isFull()) {
           this.currentPlayer.incrementScore();
           square.player = this.currentPlayer;
           didFillSquare = true;
@@ -105,38 +95,6 @@ export default {
       } else {
         this.checkForWinner();
       }
-    },
-
-    isFull(square) {
-      return square && square.left_edge.clicked && square.top_edge.clicked && square.right_edge.clicked && square.bottom_edge.clicked;
-    },
-
-    squareStyle: function(square) {
-      return {
-        left: (square.x) * TILE_WIDTH + TILE_WIDTH/3 + "px",
-        top: (square.y) * TILE_HEIGHT + TILE_HEIGHT/3 + "px",
-        width: TILE_WIDTH/2 + "px",
-        height: TILE_HEIGHT/2 + "px",
-        backgroundColor: square.player ? square.player.color : "transparent",
-      }
-    },
-
-    playerStyle: function(player) {
-      return {
-        background: player.color,
-      }
-    },
-
-    edgeStyle: function(edge) {
-      let style = {};
-      style.left = edge.vertical ? edge.x * TILE_WIDTH + "px" : edge.x * TILE_WIDTH + BORDER_WIDTH + "px";
-      style.top = edge.vertical ? edge.y * TILE_HEIGHT + BORDER_WIDTH + "px" : edge.y * TILE_HEIGHT + "px";
-      style.width = edge.vertical ? BORDER_WIDTH + "px" : TILE_WIDTH - BORDER_WIDTH + "px";
-      style.height = edge.vertical ? TILE_HEIGHT - BORDER_WIDTH + "px" : BORDER_WIDTH + "px";
-      if (edge.clicked) {
-          style.backgroundColor = edge.clicked.color;
-      }
-      return style;
     },
 
     getSquare: function(x, y) {
@@ -153,7 +111,6 @@ export default {
       if (this.getAllSquares().every(square => {
           return square.player != null;
       })) { 
-
       // non-descructive sort
       let playersSortedByScore = this.players.slice().sort((p1, p2) => { 
         return p1.score < p2.score
@@ -175,74 +132,59 @@ export default {
 
     init: function() {
       this.squares = [];
+      this.players = [new Player("Player one", "purple"), new Player("Player two", "green"), new Player("Player three", "blue")]
 
       // initialize all squares
       for (let x = 0; x < this.amount_horizontal_tiles; x++) {
         let row = [];
         for (let y = 0; y < this.amount_vertical_tiles; y++) {
-          let new_square = {
-            x: x, 
-            y: y,
-          };
-          row.push(new_square);
+          row.push(new Square(new Coord(x,y)));
         }
         this.squares.push(row);
       }
 
-    // generate edges from squares
-    this.squares.forEach(square_array => {
-      square_array.forEach(square => {
+      // generate edges from squares
+      this.squares.forEach(square_array => {
+        square_array.forEach(square => {
+          let directionalSquares = [
+            {direction: Direction.TOP, square: this.getSquare(square.x, square.y - 1)},
+            {direction: Direction.LEFT, square: this.getSquare(square.x - 1, square.y)},
+          ];
 
-      let topSquare = this.getSquare(square.x, square.y - 1);
-      let bottomSquare = this.getSquare(square.x, square.y + 1);
-      let leftSquare = this.getSquare(square.x-1, square.y);
-      let rightSquare = this.getSquare(square.x +1, square.y);
+          directionalSquares.forEach((direction_and_square) => {
+            let directional_square = direction_and_square.square;
+            let direction = direction_and_square.direction;
+            if (directional_square == null) {
+              let edge = new Edge(new Coord(square.x, square.y), direction === Direction.LEFT, [square]);
+              square.setEdge(direction, edge);
+              this.edges.push(edge);
+            } else {
+              square.setEdge(direction, directional_square.getEdge(OppositeDirection(direction)));
+            }
+          })
+        
+          directionalSquares = [
+            {direction: Direction.RIGHT, square: this.getSquare(square.x + 1, square.y)},
+            {direction: Direction.BOTTOM, square:this.getSquare(square.x, square.y + 1)},
+          ];
 
-      if (topSquare == null) {
-        square.top_edge = {
-          x: square.x,
-          y: square.y,
-          vertical: false,
-          clicked: false,
-          squares: [square]
-        }
-        this.edges.push(square.top_edge);
-      } else {
-        square.top_edge = topSquare.bottom_edge;
-      }
+          directionalSquares.forEach(direction_and_square => {
+            let directional_square = direction_and_square.square;
+            let direction = direction_and_square.direction;
+            let edgesquares = [square];
+            if (directional_square != null) edgesquares.push(directional_square);
 
-      if (leftSquare == null) {
-        square.left_edge = {
-          x: square.x,
-          y: square.y,
-          vertical: true,
-          clicked: false,
-          squares: [square]
-        }
-        this.edges.push(square.left_edge);
-      } else {
-        square.left_edge = leftSquare.right_edge;
-      }
-      
-      square.right_edge = {
-        x: square.x + 1,
-        y: square.y,
-        vertical: true,
-        clicked: false,
-        squares: [square, rightSquare]
-      }
-      this.edges.push(square.right_edge);
-      
-      square.bottom_edge = {
-        x: square.x,
-        y: square.y + 1,
-        vertical: false,
-        clicked: false,
-        squares: [square, bottomSquare]
-      }
-      this.edges.push(square.bottom_edge);
+            let edge; 
+            if (direction === Direction.RIGHT ){ 
+              edge = new Edge(new Coord(square.x+1, square.y), true, edgesquares);
+            } else {
+              edge = new Edge(new Coord(square.x, square.y+1), false, edgesquares);
+            }             
+            square.setEdge(direction, edge);
+            this.edges.push(edge);
+          })
+        })
       })
-    })
     }
   }
 }
@@ -268,14 +210,21 @@ export default {
   background-color: whitesmoke;
   border: 3px solid gray;
   padding: 24px;
-  width: 600px;
   margin-top: 50px;
+}
+
+.board-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 24px;
+  background-color: white;
+  margin-right: 12px;
 }
 
 .board {
   position: relative;
-  width: 300px;
-  height: 300px;
 }
 
 .squares {
@@ -304,9 +253,6 @@ export default {
   position: absolute;
   border-radius: 4px;
   cursor: pointer;
-}
-
-.edge:hover {
   transition: background .3s;
 }
 

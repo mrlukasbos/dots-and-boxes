@@ -20,5 +20,11 @@ class Player {
     get name() {
       return this._name;
     }
+
+    get style() {
+        return {
+          background: this.color,
+        }  
+    }
   }
 export default Player
