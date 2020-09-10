@@ -27,6 +27,8 @@ export default class Square {
     get y() { return this._pos.y; }
     set player(player) { this._player = player; }
     get player() { return this._player; }
+    get edges() { return this._edges; }
+    set edges(edges) { this._edges = edges; }
 
     setEdge(direction, edge) {
         this._edges.set(direction, edge);
@@ -50,5 +52,13 @@ export default class Square {
         height: Constants.TILE_HEIGHT/2 + "px",
         backgroundColor: this._player ? this._player.color : "transparent",
       }
+    }
+
+    copy() {
+        let copy = new Square(this._pos);
+        copy.edges = this._edges;
+        copy.player = this._player;
+        copy.edges = this._edges;
+        return copy;
     }
   }

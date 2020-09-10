@@ -40,11 +40,11 @@ export default {
       board: null,
       showConfigModal: false,
       config: {
-        width: 5,
-        height: 5,
+        width: 2,
+        height: 2,
         players: [
           new Player("John", "purple", true),
-          new Player("Mike", "orange", true),
+          new Player("Mike", "orange", false),
         ]
       },
     }
@@ -57,6 +57,7 @@ export default {
   methods: {
     init: function() {
       this.board = new Board(this.config.width, this.config.height, this.config.players);
+      this.board.create();
       this.board.start();
     }
   }

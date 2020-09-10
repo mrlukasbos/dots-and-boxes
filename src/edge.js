@@ -14,7 +14,9 @@ export default class Edge {
   set clicked(player) { this._clicked = player; }
   get vertical() { return this._vertical; }
   get squares() { return this._squares; }
-  
+  set squares(squares) { this._squares = squares; }
+  get pos() { return this._pos; }
+
   get style() {
     let style = {};
 
@@ -28,5 +30,12 @@ export default class Edge {
         style.backgroundColor = this.clicked.color;
     }
     return style;
+  }
+
+  copy() {
+    let copy = new Edge(this._pos, this._vertical, this._squares);
+    copy.clicked = this._clicked;
+    copy.squares = this._squares;
+    return copy;
   }
 }

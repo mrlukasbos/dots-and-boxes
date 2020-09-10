@@ -11,14 +11,21 @@
             <div class="player-settings">
                 <h4> Players </h4>
                 <div v-for="(player,index) in config.players" :key="index" class="player"> 
-                    <span> <input v-model="player.name" type="text" placeholder="name"/> </span>
-                    <span> <input v-model="player.color" type="text" placeholder="color"/> </span>
+                    <span> <input v-model="player.name" type="text" placeholder="Name"/> </span>
+                    <select v-model="player.color">
+                        <option disabled value="">Please select one</option>
+                        <option v-for="color in available_colors" :key="color"> {{color}}</option>
+                    </select>                    
                     <input type="checkbox" id="checkbox" v-model="player.ai">
                     <span> <a class="link small danger" v-on:click="removePlayer(player)"> ✕ </a> </span>
                 </div> 
+                <hr> 
                 <div class="player new">
-                    <span> <input v-model="new_player.name" type="text" placeholder="name"/> </span>
-                    <span> <input v-model="new_player.color" type="text" placeholder="color"/> </span>
+                    <span> <input v-model="new_player.name" type="text" placeholder="Name"/> </span>
+                    <select v-model="new_player.color">
+                        <option disabled value="">Please select one</option>
+                        <option v-for="color in available_colors" :key="color"> {{color}}</option>
+                    </select>
                     <input type="checkbox" id="checkbox" v-model="new_player.ai">
                     <span> <a class="link small" v-on:click="addPlayer"> &#43; </a> </span>
                 </div>
@@ -39,7 +46,8 @@ export default {
   props: ['config', 'visible'],
   data: function() {
       return {
-          new_player: new Player("", "")
+          new_player: new Player("", ""),
+          available_colors: ["magenta", "salmon", "gold", "blue", "steelblue", "aquamarine", "blueviolet", "coral", "dodgerblue", "purple", "orange"].sort()
       }
   },
   methods: {
