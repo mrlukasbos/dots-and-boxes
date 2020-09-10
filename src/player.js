@@ -1,25 +1,14 @@
-class Player {
+export default class Player {
     constructor(name, color) {
       this._name = name;
       this._color = color;
       this._score = 0;
     }
   
-    incrementScore() {
-      this._score++;
-    }
-  
-    get score() {
-      return this._score;
-    }
-    
-    get color() {
-      return this._color;
-    }
-
-    get name() {
-      return this._name;
-    }
+    incrementScore() { this._score++; }
+    get score() { return this._score; }
+    get color() { return this._color; }
+    get name() { return this._name; }
 
     get style() {
         return {
@@ -27,4 +16,3 @@ class Player {
         }  
     }
   }
-export default Player
