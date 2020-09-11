@@ -3,7 +3,7 @@
         <div v-for="player in board.players" :key="player.name" class="player">
           <div class="player-indicator" :class="{'current': (player === board.currentPlayer)}" :style="player.style"/>
           <span :class="{'current': (player === board.currentPlayer)}">{{player.name}} </span>
-          <span class="ai" v-if="player.ai"> AI </span>
+          <span class="player-type"> {{player.type}} </span>
           <span>({{player.score}}) </span>
         </div>
     </div>
@@ -29,12 +29,13 @@ export default {
   align-items: center;
 }
 
-.ai {
+.player-type {
   background: black;
   color: white;
   font-weight: bold;
-  margin: 0px 12px;
-  padding: 0px 8px;
+  font-size: 0.7rem;
+  margin: 0px 6px;
+  padding: 0px 4px;
   border-radius: 4px;
 }
 

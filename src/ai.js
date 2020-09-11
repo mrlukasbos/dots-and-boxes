@@ -41,45 +41,45 @@ export default class Ai {
         let availableEdges = this.availableEdges(board);
         let bestEdge = this.getRandomMove(board);
         let bestScore = -Infinity;
+        let depth = -Infinity;
+
         let currentPlayer = board.getCurrentPlayer();
 
         for (var testedge of availableEdges) {
             let copy = _.cloneDeep(board);
-
-            copy.checkForAIMove = function() {
-                // do nothing
-            }
-
-            console.log(copy);
+            copy.checkForAIMove = function() { /* do nothing */ }
             let edge = copy.getEdge(testedge.x, testedge.y, testedge.vertical)
             copy.selectEdge(edge);
 
-            let score = this.minMax(copy, currentPlayer.name, 0);
-            if (score > bestScore) {
+            let result = this.minMax(copy, currentPlayer.name, 0);
+            if (result.score > bestScore) {
                 bestEdge = testedge;
-                bestScore = score;
+                bestScore = result.score;
+            }
+            if (result.depth > depth) {
+                depth = result.depth;
             }
         }
+        console.log("search depth: ", depth);
         return board.getEdge(bestEdge.x, bestEdge.y, bestEdge.vertical);
     }
 
     static minMax(board, thisplayer, depth) {
         let availableEdges = this.availableEdges(board);
 
-        if (depth < 12) {
-            for (let i = 0; i < availableEdges.length; i++) {
-                let edge = availableEdges[i];
-                let copy = _.cloneDeep(board);
+        for (let i = 0; i < availableEdges.length; i++) {
+            let edge = availableEdges[i];
+            let copy = _.cloneDeep(board);
 
-                copy.checkForAIMove = function() {
-                    // do nothing
-                }
-                copy.selectEdge(copy.getEdge(edge.x, edge.y, edge.vertical));
-                return this.minMax(copy, thisplayer, depth + 1);
-            }
+            copy.checkForAIMove = function() { /* do nothing */ }
+            copy.selectEdge(copy.getEdge(edge.x, edge.y, edge.vertical));
+            return this.minMax(copy, thisplayer, depth + 1);
         }
-
+        
         let player = board.getPlayerByName(thisplayer);
-        return player.score;
+        return {
+            score: player.score,
+            depth: depth,
+        }
     }
 }

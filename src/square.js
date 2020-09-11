@@ -53,12 +53,4 @@ export default class Square {
         backgroundColor: this._player ? this._player.color : "transparent",
       }
     }
-
-    copy() {
-        let copy = new Square(this._pos);
-        copy.edges = this._edges;
-        copy.player = this._player;
-        copy.edges = this._edges;
-        return copy;
-    }
   }

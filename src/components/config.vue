@@ -16,7 +16,10 @@
                         <option disabled value="">Please select one</option>
                         <option v-for="color in available_colors" :key="color"> {{color}}</option>
                     </select>                    
-                    <input type="checkbox" id="checkbox" v-model="player.ai">
+                    <select v-model="player.type">
+                        <option disabled value="">Please select one</option>
+                        <option v-for="type in availabe_player_types()" :key="type"> {{type}}</option>
+                    </select>        
                     <span> <a class="link small danger" v-on:click="removePlayer(player)"> ✕ </a> </span>
                 </div> 
                 <hr> 
@@ -26,7 +29,10 @@
                         <option disabled value="">Please select one</option>
                         <option v-for="color in available_colors" :key="color"> {{color}}</option>
                     </select>
-                    <input type="checkbox" id="checkbox" v-model="new_player.ai">
+                    <select v-model="new_player.type">
+                        <option disabled value="">Please select one</option>
+                        <option v-for="type in availabe_player_types()" :key="type"> {{type}}</option>
+                    </select>                    
                     <span> <a class="link small" v-on:click="addPlayer"> &#43; </a> </span>
                 </div>
             </div>
@@ -40,20 +46,27 @@
 </template>
 
 <script>
-import Player from '../player'
+import Player, {PlayerType} from '../player'
 export default {
   name: 'config',
   props: ['config', 'visible'],
   data: function() {
       return {
-          new_player: new Player("", ""),
+          new_player: new Player("", "", PlayerType.HUMAN),
           available_colors: ["magenta", "salmon", "gold", "blue", "steelblue", "aquamarine", "blueviolet", "coral", "dodgerblue", "purple", "orange"].sort()
-      }
+    }
   },
   methods: {
+      availabe_player_types() {
+        var all = [];
+        for(let key in PlayerType){
+            all.push(PlayerType[key]);
+        }
+        return all;
+      },
       addPlayer() {
           this.config.players.push(this.new_player)
-          this.new_player = new Player("", "")
+          this.new_player = new Player("", "", PlayerType.HUMAN)
       },
       removePlayer(player) {
             const index = this.config.players.indexOf(player);
@@ -107,7 +120,15 @@ input {
     border: none;
     font-size: 1rem;
     width: 120px;
-    outline: none;;
+    outline: none;
+}
+
+select {
+    border: none;
+    font-size: 1rem;
+    width: 120px;
+    outline: none;
+    margin-right: 24px;
 }
 
 .game-settings {

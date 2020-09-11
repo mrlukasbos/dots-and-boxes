@@ -25,9 +25,9 @@ import PlayersView from './components/players'
 import BoardView from './components/board'
 import ConfigView from './components/config'
 
-import Player from './player'
+import Player, {PlayerType} from './player'
 import Board from './board'
-
+ 
 export default {
   name: 'App',
   components: {
@@ -43,8 +43,8 @@ export default {
         width: 2,
         height: 2,
         players: [
-          new Player("John", "purple", true),
-          new Player("Mike", "orange", false),
+          new Player("John", "purple", PlayerType.MINMAX),
+          new Player("Mike", "orange", PlayerType.GREEDY),
         ]
       },
     }

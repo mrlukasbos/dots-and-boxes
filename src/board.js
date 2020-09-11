@@ -2,7 +2,7 @@ import Square, {Direction, OppositeDirection} from './square'
 import Edge from './edge'
 import Coord from './coord'
 import Ai from './ai';
-import Player from './player';
+import { PlayerType } from './player';
 
 export default class Board {
     constructor(width, height, players) {
@@ -50,9 +50,20 @@ export default class Board {
     }
 
     checkForAIMove() {
-        if (this.getCurrentPlayer().ai) {
-            let randomMove = Ai.getBestMove(this);
-            this.selectEdge(randomMove);
+        switch (this.getCurrentPlayer().type) {
+            case PlayerType.RANDOM: {
+                this.selectEdge(Ai.getRandomMove(this));
+                break;
+            }
+            case PlayerType.MINMAX: {
+                this.selectEdge(Ai.getBestMove(this));
+                break;
+            }
+            case PlayerType.GREEDY: {
+                this.selectEdge(Ai.getGreedyBestMove(this));
+                break;
+            }
+            default: break;
         }
     }
 
@@ -76,8 +87,6 @@ export default class Board {
     selectEdge(edge) {
         if (edge.clicked) return;
         
-        console.log("selected new edge: ", edge);
-
         edge.clicked = this.currentPlayer;
         let didFillSquare = false;
         edge.squares.forEach(square => {
@@ -201,63 +210,5 @@ export default class Board {
             square.setEdge(direction, edge);
             this._edges.push(edge);
         })
-    }
-
-    copy() {
-
-        let simulatedPlayers = [];
-        this.players.forEach(player => {
-            let new_player = new Player(player.name, player.color);
-            new_player.score = player.score;
-            simulatedPlayers.push(new_player);
-        });
-
-        let clone = new Board(this.width, this.height, simulatedPlayers);
-        clone._currentPlayerIndex = this._currentPlayerIndex;
-        
-        // copy all edges
-        this.edges.forEach(real_edge => { 
-            let copy = real_edge.copy();
-            if (copy.clicked) {
-                copy.clicked = clone.getPlayerByName(real_edge.clicked.name); // refresh reference
-            } else {
-                copy.clicked = null;
-            }
-            clone.edges.push(copy);
-        });
-
-        // copy all squares
-        this.squares.forEach(row => { 
-            let cloned_row = [];
-            row.forEach(real_square => {
-                let copy = real_square.copy();
-                if (real_square.player) {
-                    copy.player = clone.getPlayerByName(real_square.player.name); // refresh reference
-                }
-                cloned_row.push(copy) 
-            })
-            clone.squares.push(cloned_row);           
-        });
-
-        // for each cloned edge, we must replace the references of the squares with a cloned square
-        clone.edges.forEach(cloned_edge => { 
-            return cloned_edge.squares.map(square => {
-                return clone.getSquare(square.x, square.y);
-            })
-        });
-
-        // for each cloned square, we must replace references to the edges with cloned edges
-        clone.getAllSquares().forEach(square => { 
-            Array.from(square.edges.keys()).forEach(direction => { // for each direction
-                let ref_edge = square.getEdge(direction);
-                square.edges[direction] = clone.getEdge(ref_edge.x, ref_edge.y, ref_edge.vertical);
-            })
-        });
-
-        clone.checkForAIMove = function() {
-            // do nothing
-        }
-
-        return clone;
     }
 }

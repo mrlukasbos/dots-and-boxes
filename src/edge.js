@@ -31,11 +31,4 @@ export default class Edge {
     }
     return style;
   }
-
-  copy() {
-    let copy = new Edge(this._pos, this._vertical, this._squares);
-    copy.clicked = this._clicked;
-    copy.squares = this._squares;
-    return copy;
-  }
 }
