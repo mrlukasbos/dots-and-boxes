@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 export default class Ai {
     static availableEdges(board) {
         return board.edges.filter(edge => {
@@ -12,36 +14,66 @@ export default class Ai {
     }
 
     // the higher our score the better
-    static getBestMove(board) {
+    static getGreedyBestMove(board) {
         let availableEdges = this.availableEdges(board);
-        let bestEdge = availableEdges[0];
-        let bestScore = -Infinity;
-
-        let currentPlayer = board.getCurrentPlayer();
+        let bestEdge = this.getRandomMove(board);
+        let currentPlayerName = board.getCurrentPlayer().name;
+        let previousScore = board.getCurrentPlayer().score;
 
         for (var testedge of availableEdges) {
-            let copy = board.copy();
-            let edge = copy.getEdge(testedge.x, testedge.y, testedge.vertical);
+            let copy = _.cloneDeep(board);
+            console.log(copy);
+            let edge = copy.getEdge(testedge.x, testedge.y, testedge.vertical)
             copy.selectEdge(edge);
-            
-            let score = this.minMax(copy, currentPlayer.name, 0);
-            console.log(score);
-            if (score > bestScore) {
-                bestScore = score;
-                bestEdge = edge
+            let player = copy.getPlayerByName(currentPlayerName);
+            if (player.score > previousScore) {
+                bestEdge = edge;
+                break;
             }
         }
         console.log("returning edge: ", bestEdge)
         return board.getEdge(bestEdge.x, bestEdge.y, bestEdge.vertical);
     }
 
+
+     // the higher our score the better
+     static getBestMove(board) {
+        let availableEdges = this.availableEdges(board);
+        let bestEdge = this.getRandomMove(board);
+        let bestScore = -Infinity;
+        let currentPlayer = board.getCurrentPlayer();
+
+        for (var testedge of availableEdges) {
+            let copy = _.cloneDeep(board);
+
+            copy.checkForAIMove = function() {
+                // do nothing
+            }
+
+            console.log(copy);
+            let edge = copy.getEdge(testedge.x, testedge.y, testedge.vertical)
+            copy.selectEdge(edge);
+
+            let score = this.minMax(copy, currentPlayer.name, 0);
+            if (score > bestScore) {
+                bestEdge = testedge;
+                bestScore = score;
+            }
+        }
+        return board.getEdge(bestEdge.x, bestEdge.y, bestEdge.vertical);
+    }
+
     static minMax(board, thisplayer, depth) {
         let availableEdges = this.availableEdges(board);
 
-        if (depth < 5) {
+        if (depth < 12) {
             for (let i = 0; i < availableEdges.length; i++) {
                 let edge = availableEdges[i];
-                let copy = board.copy();
+                let copy = _.cloneDeep(board);
+
+                copy.checkForAIMove = function() {
+                    // do nothing
+                }
                 copy.selectEdge(copy.getEdge(edge.x, edge.y, edge.vertical));
                 return this.minMax(copy, thisplayer, depth + 1);
             }
