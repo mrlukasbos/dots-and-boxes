@@ -22,7 +22,7 @@ export default class Ai {
 
         for (var testedge of availableEdges) {
             let copy = _.cloneDeep(board);
-            console.log(copy);
+            copy.simulation = true;
             let edge = copy.getEdge(testedge.x, testedge.y, testedge.vertical)
             copy.selectEdge(edge);
             let player = copy.getPlayerByName(currentPlayerName);
@@ -31,55 +31,87 @@ export default class Ai {
                 break;
             }
         }
-        console.log("returning edge: ", bestEdge)
         return board.getEdge(bestEdge.x, bestEdge.y, bestEdge.vertical);
     }
 
 
      // the higher our score the better
      static getBestMove(board) {
-        let availableEdges = this.availableEdges(board);
-        let bestEdge = this.getRandomMove(board);
-        let bestScore = -Infinity;
-        let depth = -Infinity;
-
         let currentPlayer = board.getCurrentPlayer();
-
-        for (var testedge of availableEdges) {
-            let copy = _.cloneDeep(board);
-            copy.checkForAIMove = function() { /* do nothing */ }
-            let edge = copy.getEdge(testedge.x, testedge.y, testedge.vertical)
-            copy.selectEdge(edge);
-
-            let result = this.minMax(copy, currentPlayer.name, 0);
-            if (result.score > bestScore) {
-                bestEdge = testedge;
-                bestScore = result.score;
-            }
-            if (result.depth > depth) {
-                depth = result.depth;
-            }
-        }
-        console.log("search depth: ", depth);
+        let result = this.alphaBeta(board, currentPlayer, currentPlayer, 0, -Infinity, +Infinity);
+        let bestEdge = result.move;
         return board.getEdge(bestEdge.x, bestEdge.y, bestEdge.vertical);
     }
 
-    static minMax(board, thisplayer, depth) {
-        let availableEdges = this.availableEdges(board);
+    static alphaBeta(board, lastplayer, maximizingplayer, depth, alpha, beta) {
+        let is_maximizing  = lastplayer.name === maximizingplayer.name;
 
-        for (let i = 0; i < availableEdges.length; i++) {
-            let edge = availableEdges[i];
-            let copy = _.cloneDeep(board);
-
-            copy.checkForAIMove = function() { /* do nothing */ }
-            copy.selectEdge(copy.getEdge(edge.x, edge.y, edge.vertical));
-            return this.minMax(copy, thisplayer, depth + 1);
-        }
+        if (board.gameIsFinished()) {
+            let score = 0;
+          
+         //   if (is_maximizing) {
+                score =lastplayer.score; 
+           // } else {
+             //   score = -board.getPlayerByName(lastplayer.name).score;
+           // }
+            return {
+                score:  score,
+                depth: depth,
+            }
+        }                
         
-        let player = board.getPlayerByName(thisplayer);
-        return {
-            score: player.score,
-            depth: depth,
+        let availableEdges = this.availableEdges(board);
+        let currentPlayer = board.getCurrentPlayer();
+        let move = this.getRandomMove(board);
+
+        // maximizing
+        if (is_maximizing) {
+            let value = -Infinity;
+            let depth = 0;
+            for (let i = 0; i < availableEdges.length; i++) {
+                let edge = availableEdges[i];
+                let copy = _.cloneDeep(board);
+                copy.simulation = true;
+                copy.selectEdge(copy.getEdge(edge.x, edge.y, edge.vertical));
+                let result = this.alphaBeta(copy, currentPlayer, maximizingplayer, depth + 1, alpha, beta);
+                if (result.score > value) {
+                    value = result.score;
+                    move = edge;
+                    depth = result.depth;
+                }
+                alpha = Math.max(alpha, value)
+                if (alpha >= beta) break;   
+            }
+            return {
+                move: move,
+                score: value,
+                depth: depth,
+            }
+
+        // minimizing
+        } else {
+            let value = Infinity;
+            let depth = 0;
+            for (let i = 0; i < availableEdges.length; i++) {
+                let edge = availableEdges[i];
+                let copy = _.cloneDeep(board);
+                copy.simulation = true;
+                copy.selectEdge(copy.getEdge(edge.x, edge.y, edge.vertical));
+                let result = this.alphaBeta(copy, currentPlayer, maximizingplayer, depth + 1, alpha, beta);
+                if (result.score < value) {
+                    value = result.score;
+                    move = edge;
+                    depth = result.depth;
+                }
+                beta = Math.min(beta, value)
+                if (beta <= alpha) break;                  
+            }
+            return {
+                move: move,
+                score: value,
+                depth: depth,
+            }   
         }
     }
+
 }

@@ -13,7 +13,8 @@ export default class Board {
         this._edges = [];
         this._currentPlayerIndex = 0;
         this._winner = null;
-        this._draw = false
+        this._draw = false;
+        this._simulation = false;
     }
 
     get width() { return this._width; }
@@ -24,6 +25,9 @@ export default class Board {
     get players() { return this._players }
     get winner() { return this._winner; }
     get draw() { return this._draw } 
+
+    get simulation() { return this._simulation; }
+    set simulation(simulation) { this._simulation = simulation } 
 
     // return square at a given coordinate, null if it does not exist
     getSquare(x, y) {
@@ -50,20 +54,22 @@ export default class Board {
     }
 
     checkForAIMove() {
-        switch (this.getCurrentPlayer().type) {
-            case PlayerType.RANDOM: {
-                this.selectEdge(Ai.getRandomMove(this));
-                break;
+        if (!this._simulation) {
+            switch (this.getCurrentPlayer().type) {
+                case PlayerType.RANDOM: {
+                    this.selectEdge(Ai.getRandomMove(this));
+                    break;
+                }
+                case PlayerType.MINMAX: {
+                    this.selectEdge(Ai.getBestMove(this));
+                    break;
+                }
+                case PlayerType.GREEDY: {
+                    this.selectEdge(Ai.getGreedyBestMove(this));
+                    break;
+                }
+                default: break;
             }
-            case PlayerType.MINMAX: {
-                this.selectEdge(Ai.getBestMove(this));
-                break;
-            }
-            case PlayerType.GREEDY: {
-                this.selectEdge(Ai.getGreedyBestMove(this));
-                break;
-            }
-            default: break;
         }
     }
 
