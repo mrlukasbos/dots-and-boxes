@@ -122,7 +122,7 @@ export default class Board {
     // returns true if the game is finished and it is a draw
     gameIsDrawn() {
         let players = this.getPlayersSortedByScore();
-        return this.gameIsFinished() && players[0].score == players[1].score
+        return this.gameIsFinished() && players[0].score === players[1].score
     }
 
     hasWinner() {
