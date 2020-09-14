@@ -36,12 +36,16 @@ export default class Board {
         return column[y];
     }
 
+    // return an edge by it's properties
+    // this is useful when comparing edges between different boards
     getEdge(x, y, vertical) {
         return this.edges.find(edge => {
             return edge.x === x && edge.y === y && edge.vertical === vertical;
         })
     }
 
+    // return a player by it's name
+    // this is useful when comparing edges between different boards
     getPlayerByName(name) {
         return this.players.find(player => {
             return player.name === name
@@ -53,6 +57,7 @@ export default class Board {
         return this.squares.flat();
     }
 
+    // return the total amount of squares that have a player
     getTotalScore() {
         return this.getAllSquares().filter(square => {
             return square.player != null;
@@ -137,6 +142,7 @@ export default class Board {
         return this.gameIsFinished() && players[0].score === players[1].score
     }
 
+    // true if there is a winner
     hasWinner() {
        return this.gameIsFinished() && !this.gameIsDrawn()
     }
@@ -153,6 +159,7 @@ export default class Board {
         }
     }
 
+    // create the board
     create() {
         this.createSquares();
         this.createEdges();    
