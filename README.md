@@ -1,4 +1,4 @@
-# athom-challenge
+# dots-and-boxes
 
 ## Project setup
 ```
