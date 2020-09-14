@@ -40,11 +40,11 @@ export default {
       board: null,
       showConfigModal: false,
       config: {
-        width: 2,
-        height: 2,
+        width: 3,
+        height: 3,
         players: [
-          new Player("John", "purple", PlayerType.MINMAX),
-          new Player("Mike", "orange", PlayerType.HUMAN),
+          new Player("You", "orange", PlayerType.HUMAN),
+          new Player("Computer", "purple", PlayerType.MINMAX),
         ]
       },
     }

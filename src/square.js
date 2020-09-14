@@ -28,7 +28,6 @@ export default class Square {
     set player(player) { this._player = player; }
     get player() { return this._player; }
     get edges() { return this._edges; }
-    set edges(edges) { this._edges = edges; }
 
     setEdge(direction, edge) {
         this._edges.set(direction, edge);

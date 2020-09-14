@@ -14,7 +14,6 @@ export default class Edge {
   set clicked(player) { this._clicked = player; }
   get vertical() { return this._vertical; }
   get squares() { return this._squares; }
-  set squares(squares) { this._squares = squares; }
   get pos() { return this._pos; }
 
   get style() {

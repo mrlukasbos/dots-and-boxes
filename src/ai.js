@@ -1,4 +1,5 @@
 var _ = require('lodash');
+import Constants from './constants'
 
 export default class Ai {
 
@@ -57,7 +58,7 @@ export default class Ai {
         // the heuristic is as follows: 
         // the score of the maximizing player with respect to the total score.
         // therefore a good score is achieved when the maximizing player has a high score and the others have a low score
-        if (board.gameIsFinished() || depth >= 4) {
+        if (board.gameIsFinished() || depth >= Constants.MINMAX_MAX_SEARCH_DEPTH) {
             let maximizing_score = board.getPlayerByName(maximizingplayer.name).score;
             let other_score = (board.getTotalScore() - maximizing_score); // total score - my score
             return {

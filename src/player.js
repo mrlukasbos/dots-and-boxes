@@ -15,7 +15,6 @@ export default class Player {
   
     incrementScore() { this._score++; }
     get score() { return this._score; }
-    set score(score) { this._score = score; }
     resetScore() { this._score = 0; }
     get color() { return this._color; }
     set color(color) { this._color = color }
