@@ -1,19 +1,23 @@
 var _ = require('lodash');
 
 export default class Ai {
+
+    // Return the empty edges of a given board
     static availableEdges(board) {
         return board.edges.filter(edge => {
             return edge.clicked == null;
         })
     }
 
+    // Returns a random available edge
     static getRandomMove(board) {
         let availableEdges = this.availableEdges(board);
         let randomIndex = Math.floor(Math.random() * availableEdges.length);
         return availableEdges[randomIndex];
     }
 
-    // the higher our score the better
+    // Get a greedy move: if a move increases the score of the currentplayer it will be returned. 
+    // Otherwise a random move is returned
     static getGreedyBestMove(board) {
         let availableEdges = this.availableEdges(board);
         let bestEdge = this.getRandomMove(board);
@@ -35,23 +39,29 @@ export default class Ai {
     }
 
 
-     // the higher our score the better
-     static getBestMove(board) {
+    // This function uses Alpha/Beta pruning to find the best move
+    static getBestMove(board) {
         let currentPlayer = board.getCurrentPlayer();
-        let result = this.alphaBeta(board, currentPlayer, currentPlayer, 0, -Infinity, +Infinity);
+        let result = this.alphaBeta(board, currentPlayer, currentPlayer, 0, -Infinity, Infinity);
         let bestEdge = result.move;
         console.log(result.score);
         return board.getEdge(bestEdge.x, bestEdge.y, bestEdge.vertical);
-
     }
 
+    // Apply alpha/beta pruning through a recursive function. 
+    // if the currentplayer === the maximizingplayer, then 
     static alphaBeta(board, lastplayer, maximizingplayer, depth, alpha, beta) {
         let is_maximizing = lastplayer.name === maximizingplayer.name;
         let availableEdges = this.availableEdges(board);
        
-        if (board.gameIsFinished() || depth >= 3) {
+        // the heuristic is as follows: 
+        // the score of the maximizing player with respect to the total score.
+        // therefore a good score is achieved when the maximizing player has a high score and the others have a low score
+        if (board.gameIsFinished() || depth >= 4) {
+            let maximizing_score = board.getPlayerByName(maximizingplayer.name).score;
+            let other_score = (board.getTotalScore() - maximizing_score); // total score - my score
             return {
-                score: board.getPlayerByName(lastplayer.name).score,
+                score: maximizing_score - other_score,
                 depth: depth,
             }
         }
