@@ -40,44 +40,43 @@ export default class Ai {
         let currentPlayer = board.getCurrentPlayer();
         let result = this.alphaBeta(board, currentPlayer, currentPlayer, 0, -Infinity, +Infinity);
         let bestEdge = result.move;
+        console.log(result.score);
         return board.getEdge(bestEdge.x, bestEdge.y, bestEdge.vertical);
+
     }
 
     static alphaBeta(board, lastplayer, maximizingplayer, depth, alpha, beta) {
-        let is_maximizing  = lastplayer.name === maximizingplayer.name;
-
-        if (board.gameIsFinished()) {
-            let score = 0;
-          
-         //   if (is_maximizing) {
-                score =lastplayer.score; 
-           // } else {
-             //   score = -board.getPlayerByName(lastplayer.name).score;
-           // }
+        let is_maximizing = lastplayer.name === maximizingplayer.name;
+        let availableEdges = this.availableEdges(board);
+       
+        if (board.gameIsFinished() || depth >= 3) {
             return {
-                score:  score,
+                score: board.getPlayerByName(lastplayer.name).score,
                 depth: depth,
             }
-        }                
-        
-        let availableEdges = this.availableEdges(board);
+        }
+
         let currentPlayer = board.getCurrentPlayer();
+        let currentScore = currentPlayer.score;
         let move = this.getRandomMove(board);
 
         // maximizing
         if (is_maximizing) {
             let value = -Infinity;
-            let depth = 0;
-            for (let i = 0; i < availableEdges.length; i++) {
-                let edge = availableEdges[i];
+            for (let edge of availableEdges) {
                 let copy = _.cloneDeep(board);
                 copy.simulation = true;
                 copy.selectEdge(copy.getEdge(edge.x, edge.y, edge.vertical));
-                let result = this.alphaBeta(copy, currentPlayer, maximizingplayer, depth + 1, alpha, beta);
+
+                let new_depth = depth + 1;
+                if (copy.getPlayerByName(currentPlayer.name).score > currentScore) {
+                    new_depth = depth;
+                }
+
+                let result = this.alphaBeta(copy, currentPlayer, maximizingplayer, new_depth, alpha, beta);
                 if (result.score > value) {
                     value = result.score;
                     move = edge;
-                    depth = result.depth;
                 }
                 alpha = Math.max(alpha, value)
                 if (alpha >= beta) break;   
@@ -85,23 +84,25 @@ export default class Ai {
             return {
                 move: move,
                 score: value,
-                depth: depth,
             }
 
         // minimizing
         } else {
             let value = Infinity;
-            let depth = 0;
-            for (let i = 0; i < availableEdges.length; i++) {
-                let edge = availableEdges[i];
+            for (let edge of availableEdges) {
                 let copy = _.cloneDeep(board);
                 copy.simulation = true;
                 copy.selectEdge(copy.getEdge(edge.x, edge.y, edge.vertical));
-                let result = this.alphaBeta(copy, currentPlayer, maximizingplayer, depth + 1, alpha, beta);
+
+                let new_depth = depth + 1;
+                if (copy.getPlayerByName(currentPlayer.name).score > currentScore) {
+                    new_depth = depth;
+                }
+
+                let result = this.alphaBeta(copy, currentPlayer, maximizingplayer, new_depth, alpha, beta);
                 if (result.score < value) {
                     value = result.score;
                     move = edge;
-                    depth = result.depth;
                 }
                 beta = Math.min(beta, value)
                 if (beta <= alpha) break;                  
@@ -109,7 +110,6 @@ export default class Ai {
             return {
                 move: move,
                 score: value,
-                depth: depth,
             }   
         }
     }

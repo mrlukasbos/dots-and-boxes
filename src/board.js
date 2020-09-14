@@ -53,6 +53,12 @@ export default class Board {
         return this.squares.flat();
     }
 
+    getTotalScore() {
+        return this.getAllSquares().filter(square => {
+            return square.player != null;
+        }).length
+    }
+
     checkForAIMove() {
         if (!this._simulation) {
             switch (this.getCurrentPlayer().type) {

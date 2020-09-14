@@ -44,7 +44,7 @@ export default {
         height: 2,
         players: [
           new Player("John", "purple", PlayerType.MINMAX),
-          new Player("Mike", "orange", PlayerType.GREEDY),
+          new Player("Mike", "orange", PlayerType.HUMAN),
         ]
       },
     }
